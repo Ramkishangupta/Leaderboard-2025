@@ -6,14 +6,17 @@ const Leaderboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This function only runs once when the component mounts
     const fetchPlayers = async () => {
       try {
         const res = await axios.get('https://induction-backend.onrender.com/api/v1');
-        if (res.data.success) {
-          const sorted = res.data.player.sort((a, b) => b.score - a.score);
+
+        if (res.data.success && Array.isArray(res.data.players)) {
+          const sorted = res.data.players.sort((a, b) => b.score - a.score);
           setPlayers(sorted);
+        } else {
+          console.error("Unexpected response format:", res.data);
         }
+
       } catch (err) {
         console.error("Failed to fetch leaderboard:", err);
       } finally {
@@ -22,7 +25,7 @@ const Leaderboard = () => {
     };
 
     fetchPlayers();
-  }, []); // ← Empty array means run only on first load
+  }, []);
 
   return (
     <div style={{ padding: '2rem' }}>
